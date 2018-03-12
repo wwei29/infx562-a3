@@ -196,7 +196,7 @@ var colorDict = {
 };
 
 //init the map
-queue()
+d3.queue()
     .defer(d3.json, "https://d3js.org/world-50m.v1.json")
     .defer(d3.csv, "data/database.csv")
     .await(loadMyMap);
@@ -240,7 +240,7 @@ function endYearChanged(){
     else{
         g.selectAll("circle").remove();
         d3.select("#warningMsg")
-        .text("End year must >= end year, please try again.")
+        .text("End year must >= start year, please try again.")
         .style("color","red");
     }
 }
