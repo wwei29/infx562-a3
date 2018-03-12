@@ -387,7 +387,7 @@ function checkUpdate(){
 
 function magFilter(magSelected){
     //console.log("init magSelected");
-    d3.csv("/data/database.csv", function(err, data){
+    d3.csv("data/database.csv", function(err, data){
         //console.log(data[0]);
 
         //console.log("magselected", magSelected);
@@ -438,7 +438,7 @@ function magFilter(magSelected){
 
 function zoomCircles(){
     //console.log("init magSelected");
-    d3.csv("/data/database.csv", function(err, data){
+    d3.csv("data/database.csv", function(err, data){
     
     g.selectAll("circle")
         .data(data)
@@ -483,7 +483,7 @@ function checkSwicth(){
         console.log(sw);
         if(sw.property("checked")){
             queue()
-            .defer(d3.json, "/data/tectonicplates-master/GeoJSON/PB2002_plates.json")
+            .defer(d3.json, "data/tectonicplates-master/GeoJSON/PB2002_plates.json")
             .await(loadTectPlates);
             switchStatus.text("ON");
         }
@@ -497,7 +497,7 @@ function checkSwicth(){
 
 function updateMap(magSelected,startYear,endYear,zoomLevel){
     //console.log("init magSelected");
-    d3.csv("/data/database.csv", function(err, data){
+    d3.csv("data/database.csv", function(err, data){
           //console.log("magselected", magSelected);
     g.selectAll("circle")
         .data(data)
