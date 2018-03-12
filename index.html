@@ -1,0 +1,233 @@
+<!-- 
+    reference: http://ds.iris.edu/ieb/index.html 
+    https://bl.ocks.org/mbostock/d4021aa4dccfd65edffd 
+    http://techslides.com/demos/d3/worldmap-template.html
+    http://bl.ocks.org/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f
+    http://plnkr.co/edit/oGSFwfsyWoBS3aPQcLqa?p=preview 
+    https://rasmusfonseca.github.io/d3RangeSlider/
+
+-->
+
+<!DOCTYPE html>
+<html lang = "en" style="height:100%">
+
+
+<head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">-->
+    <title>Earthquake Visualization</title>
+</head>
+
+
+<style>
+
+* { padding: 0; margin: 0; }
+
+html, body, #fullheight {
+    min-height: 100% !important;
+    height: 100%;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: 0.5px;
+  stroke-opacity: 0.5;
+}
+
+.land {
+  fill: #777;
+  opacity: 0.4;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 80px;
+  height: 30px;
+  font: 12px sans-serif;
+  background: white;
+  opacity:0.5;
+  border: 0px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+div.circletooltip {
+    position: absolute;
+    text-align: left;
+    width: 180px;
+    height: 80px;
+    padding: 0px;
+    font: 12px sans-serif;
+    background: azure;
+    border: 0px;
+    border-radius: 2px;
+    pointer-events: none;
+    }
+
+/* Hide default HTML checkbox */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+  
+.switch input {display:none;}
+  
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16.5px;
+    width: 16.5px;
+    left: 3px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+input:checked + .slider {
+    background-color: #2196F3;
+}
+  
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+  
+input:checked + .slider:before {
+    -webkit-transform: translateX(17px);
+    -ms-transform: translateX(17px);
+    transform: translateX(17px);
+}
+  
+  /* Rounded sliders */
+.slider.round {
+    border-radius: 18px;
+    width: 40px;
+    height: 20px;
+}
+  
+.slider.round:before {
+    border-radius: 50%;
+}
+
+</style>
+
+
+
+<!-- HTML -->
+<body>
+    <div id="toolDiv" style="z-index:5"></div>
+    <div id="toolCircle" style="z-index:5"></div>
+
+    
+    <div style="height:100%;width:100%;z-index:0;background-color: #fff">
+                
+        <div style="height:100%;width:19%;float:left;margin-left:1%;" id="filterPanel">
+          <h3>Visualization of Significant Earthquakes from 2008 to 2016</h3>
+          <h5>(Moment Magnitude >= 5.5)</h5>
+          
+            <!-- year filter -->
+            <br>
+            <br>
+            <div>
+                <h5>Tectonic Plates:</h5><label class="switch"><input type="checkbox" id="tectSwitch" class="switch"><span class="slider round"></span></label> <label id="switchStatus"></label> 
+            </div>
+            <br>
+            <h5>Year Range:</h5>
+            <p>Start Year: <select id="startYear" name="year-list">
+                <option value="2008" selected="selected">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010">2010</option> 
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option> 
+                <option value="2014">2014</option>    
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+            </select></p>
+            <p>End Year:    <select id="endYear" name="year-list">
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010">2010</option> 
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option> 
+                <option value="2014">2014</option>    
+                <option value="2015">2015</option>
+                <option value="2016" selected="selected">2016</option>
+            </select></p>
+            
+          <div id="warningMsg"></div>
+          <br>
+          <h5>Magnitude:</h5>
+          <fieldset style="width:70%">
+              <div>
+                    <input type="checkbox" id="fiveSix2" class="magnitude" value="fiveSix2" checked>
+                    <label for="fiveSix2"></label>[5.5, 6.0)</label>
+                  </div>
+              <div>
+                  <input type="checkbox" id="sixSeven1" class="magnitude" value="sixSeven1" checked>
+                  <label for="sixSeven1">[6.0, 6.5)</label>
+              </div>
+              <div>
+                    <input type="checkbox" id="sixSeven2" class="magnitude" value="sixSeven2" checked>
+                    <label for="sixSeven2">[6.5, 7.0)</label>
+                </div>
+              <div>
+                  <input type="checkbox" id="sevenEight" class="magnitude" value="sevenEight" checked>
+                  <label for="sevenEight">[7.0, 8.0)</label>
+              </div>
+              <div>
+                  <input type="checkbox" id="eightPlus" class="magnitude" value="eightPlus" checked>
+                  <label for="eightPlus">8.0+</label>
+              </div>
+            </fieldset>
+        <br>
+        <h5>Legend</h5>
+        <fieldset style="width:70%;height:70px">
+        <svg id="circleLegend" style="width:100%"></svg>
+        </fieldset>
+        <br>
+        <div style="position:absolute;bottom:25px"><i>Wei Wei INFX562</i></div>
+        </div>
+
+        <div style="height:100%;width:80%;float:right;background-color: #fff" id="mapContainer">
+            <svg id="map" style="height:100%;width:100%;background-color: #fff"></svg>
+        </div>
+
+        
+    </div>
+</body>
+
+
+<!-- JavaScript modules -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="earthquake.js"></script>
+
+
+
+</html>
