@@ -198,7 +198,7 @@ var colorDict = {
 //init the map
 queue()
     .defer(d3.json, "https://d3js.org/world-50m.v1.json")
-    .defer(d3.csv, "/data/database.csv")
+    .defer(d3.csv, "data/database.csv")
     .await(loadMyMap);
 
 
